@@ -1,0 +1,69 @@
+<h1><%= @post.title %></h1>
+
+
+<p><%= @post.content %></p>
+<%= I18n.l Date.today, :format => :long %>
+<a href="https://twitter.com/share" class="twitter-share-button" data-url="/test.dev:3000/posts/<%= @post.id %>" data-text="http://test.dev:3000/posts/<%= @post.id %>" data-via="yoshi_aliens" data-lang="ja">ツイート</a>
+
+<h2>COMMENT</h2>
+<ul>
+<% if @post.comments.any? %>
+<% @post.comments.each do |comment| %>
+<li id="comment_<%= comment.id %>">
+	<%= comment.body %>(by <%= comment.commenter %>)
+<%= link_to 'delete', [comment.post, comment], :confirm => 'Sure?',
+											   :method => :delete,
+											   :remote => true %>
+</li>
+<% end %>
+<% else %>
+<li>no comment yet.</li>
+<% end %>
+</ul>
+
+<h2>ADD A COMMENT</h2>
+<%= form_for([@post, @comment]) do |f| %>
+
+<% if @comment.errors.any? %>
+<ul>
+<% @comment.errors.full_messages.each do |msg| %>
+	<li><%= msg %></li>
+<% end %>
+</ul>
+<% end %>
+
+<div class="field">
+	<%= f.label :commenter %>
+	<%= f.text_field :commenter %>
+</div>
+<div class="field">
+	<%= f.label :body %>
+	<%= f.text_area :body, :rows => 5 %>
+</div>
+<div class="actions">
+	<%= f.submit %>
+</div>
+<% end %>
+
+<%= link_to 'home', posts_path %>
+
+<script>
+$(function(){
+
+	$(document).on('ajax:success', 'a[data-method="delete"]', function(e, data, status, xhr)
+	{
+		$('#comment_'+data.comment.id).fadeOut("slow");
+	});
+
+});
+
+</script>
+
+<script>
+	!function(d,s,id){
+		var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){
+				js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);
+			}
+	}
+	(document, 'script', 'twitter-wjs');
+</script>
